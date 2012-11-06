@@ -1,0 +1,14 @@
+
+To do list:
+
+- Prescribed displacements (implemented, needs validation)
+- Gravity Loading
+- Thermal Loading
+- Hybrid elements in frame analysis
+- Natural frequencies and mode shapes
+- 3d frames and trusses.
+- Material non-linearity (plasticity)
+- Geometric non-linearity (big displacements)
+- Document functions
+- Write validation reports against mastan2 (LaTeX?)
+
