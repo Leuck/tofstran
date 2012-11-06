@@ -2,5 +2,5 @@
 The Open and Free Structutal Analysis
 
 This project currently consists of functions for solving two dimensional frames and trusses.
-It is written in pyhton3 and uses numpy. Examples are provided in the test*.py files.
+It is written in python3 and uses numpy. Examples are provided in the test*.py files.
 
