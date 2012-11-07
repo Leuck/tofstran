@@ -40,8 +40,8 @@ elements = np.array([[0,1]])"""
                 [ 0, 6*E*I/L**2, 2*E*I/L, 0, -6*E*I/L**2, 4*E*I/L]
                 ])
         elif t==1:
-            # remember to write matrix reduction routine before using this
             # element articulated at end A
+            # remember to write matrix reduction routine before using this
             K = np.array([
                 [ E*A/L, 0, 0, -E*A/L, 0, 0 ],
                 [ 0, 3*E*I/L**3, 0, 0, -3*E*I/L**3, 3*E*I/L**2 ],
@@ -51,8 +51,8 @@ elements = np.array([[0,1]])"""
                 [ 0, 3*E*I/L**2, 0, 0, -3*E*I/L**2, 3*E*I/L ]
                 ])
         elif t==2:
-            # remember to write matrix reduction routine before using this
             # element articulated at both ends
+            # remember to write matrix reduction routine before using this
             K = np.array([
                 [ E*A/L, 0, 0, -E*A/L, 0, 0 ],
                 [ 0, 0, 0, 0, 0, 0 ],
@@ -265,9 +265,6 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
         for j in list(range(dof)):
             if fixities[i,j+1] != 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
-
-    print(KG)
-    print(F)
 
     # solves system
     X = np.linalg.solve(KG,F)
