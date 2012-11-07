@@ -36,11 +36,12 @@ loads = np.array([
     [ 1, 0, -1700, 0 ],
     [ 4, -100, 0, 0 ]
     ])
+nan = float("nan")
 fixities = np.array([
     #[ node number, x, y, rotation]
-    # 0 means free
-    [ 0, 1, 1, 0],
-    [ 2, 0, 1, 0]
+    # nan means free
+    [ 0, 0, 0, nan],
+    [ 2, nan, 0, nan]
     ])
 
 R = solvetruss2d(nodes, elements, properties, loads, fixities )

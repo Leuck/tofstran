@@ -7,8 +7,8 @@ To do list:
 - Hybrid elements in frame analysis
 - Natural frequencies and mode shapes
 - 3d frames and trusses.
-- Material non-linearity (plasticity)
 - Geometric non-linearity (big displacements)
+- Material non-linearity (plasticity)
 - Document functions
 - Write validation reports against mastan2 (LaTeX?)
 

@@ -261,10 +261,16 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
     # applies fixity conditions to global stiffness matrix
+    bignumber = 8**(sys.float_info.max_10_exp/2)
     for i in list(range(len(fixities))):
         for j in list(range(dof)):
-            if fixities[i,j+1] != 0:
+            if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
+            elif not np.isnan(fixities[i,j+1]):
+                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = \
+                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] * bignumber
+                F[fixities[i,0]*dof+j ] = fixities[i,1+j]* \
+                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ]
 
     # solves system
     X = np.linalg.solve(KG,F)
@@ -283,11 +289,10 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
     # normal stresses
     S = []
     for i in list(range(noe)):
-        N = abs(Fe[i][0,0])
+        N = Fe[i][0,0]
         A = properties[elements[i,2], 1 ]
-        Sxa = N/A
-        Sxb = N/A
-        S.append(np.array([Sxa, Sxb ]))
+        Sx = N/A
+        S.append(np.array([Sx ]))
 
     return [X, Fe, S ]
 # end of function solvetruss2d()
