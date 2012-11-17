@@ -21,9 +21,9 @@ elements = np.array([
 
 # material and section properties
 properties = np.array([
-    #[ E, A, I, h, t ] (t is element type, 0 for regular beam)
-    [ 2e11, 2.5e-3,  2.0833e-6, .1 , 0 ],
-    [ 2e11, 6.25e-4, 3.2552e-8, .025, 0  ]
+    #[ E, rho, A, I, height, t ] (t is element type, 0 for regular beam)
+    [ 2e11, 7800, 2.5e-3,  2.0833e-6, .1 , 0 ],
+    [ 2e11, 7800, 6.25e-4, 3.2552e-8, .025, 0  ]
     # rectangular sections, 25x100 and 25x25 mm
     ])
 
@@ -41,7 +41,14 @@ fixities = np.array([
     [ 2, 0, 0, nan ]
     ])
 
-R = solveframe2d(nodes, elements, properties, loads, fixities )
+# not yet functional
+gravityvector = np.array([
+    0,
+    0,#-9.81,
+    0
+    ])
+
+R = solveframe2d(nodes, elements, properties, loads, fixities, gravityvector )
 
 print("\n== DISPLACEMENTS ==\n")
 Dis = np.split(R[0], len(nodes) )

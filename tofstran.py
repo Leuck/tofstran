@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# Copyright 2012 Ricardo Frederico Leuck Filho
+# Copyright (C) 2012 Ricardo Frederico Leuck Filho
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import numpy as np
 import sys
 
 # solver for 2d frames
-def solveframe2d(nodes, elements, properties, loads, fixities ):
+def solveframe2d(nodes, elements, properties, loads, fixities, gravityvector ):
     """
     Finds node displacements, element forces and stresses in a \
 2-dimensional linear elastic frame.
@@ -64,6 +64,29 @@ elements = np.array([[0,1]])"""
 
         return K
 
+    # element's local mass (Theres something wrong here)
+    def Mle(A, rho, L):
+        """Returns a beam element's local mass matrix."""
+        M = (A*L*rho/2) * np.array([
+            [ 1, 0, 0, 0, 0, 0],
+            [ 0, 1, 0, 0, 0, 0],
+            [ 0, 0, 0, 0, 0, 0],
+            [ 0, 0, 0, 1, 0, 0],
+            [ 0, 0, 0, 0, 1, 0],
+            [ 0, 0, 0, 0, 0, 0]
+            ])
+
+        #M = (A*L*rho/420) * np.array([
+            #[ 140, 0, 0, 70, 0, 0],
+            #[ 0, 156, 22*L, 0, 54, -13*L],
+            #[ 0, 22*L, 4*L**2, 0, 13*L, -3*L**2],
+            #[ 70, 0, 0, 140, 0, 0],
+            #[ 0, 54, 13*L, 0, 156, -22*L],
+            #[ 0, -13*L, -3*L**2, 0, -22*L, 4*L**2]
+            #])
+
+        return M
+
     # rotation matrix
     def rotationMatrix(coord1, coord2 ):
         """Returns the rotation matrix for an element based on its\
@@ -104,18 +127,31 @@ elements = np.array([[0,1]])"""
 
     KGsize = np.size(nodes,0)*3
     KG = np.zeros((KGsize,KGsize))
+    MG = np.zeros((KGsize,KGsize))
 
     # list containing all elements' stiffness in global coordinates
     kg = []
+    ke = []
     for i in list(range(noe)):
         E = properties[elements[i,2], 0]
-        A = properties[elements[i,2], 1]
-        I = properties[elements[i,2], 2]
+        A = properties[elements[i,2], 2]
+        I = properties[elements[i,2], 3]
+        t = properties[elements[i,2], 5]
         coord1 = nodes[elements[i,0] ]
         coord2 = nodes[elements[i,1] ]
-        t = properties[elements[i,2], 4]
         L = ((coord2[0] -coord1[0])**2 +(coord2[1] -coord1[1])**2)**(1/2)
-        kg.append(Kge(Kle(E,A,I,L,t), coord1, coord2 ))
+        ke.append(Kle(E,A,I,L,t))
+        kg.append(Kge(ke[i], coord1, coord2 ))
+
+    ## list containing all elements' mass in global coordinates
+    #mg = []
+    #for i in list(range(noe)):
+        #rho = properties[elements[i,2], 1]
+        #A = properties[elements[i,2], 2]
+        #coord1 = nodes[elements[i,0] ]
+        #coord2 = nodes[elements[i,1] ]
+        #L = ((coord2[0] -coord1[0])**2 +(coord2[1] -coord1[1])**2)**(1/2)
+        #mg.append(Kge(Mle(A,rho,L), coord1, coord2 ))
 
     # assemble global stiffness matrix
     for i in list(range(noe)):
@@ -128,11 +164,44 @@ elements = np.array([[0,1]])"""
                 KG[na*3+j, nb*3+k] += kg[i][j, k+3]
                 KG[nb*3+j, na*3+k] += kg[i][j+3, k]
 
+    ## assemble global mass matrix
+    #for i in list(range(noe)):
+        #na = elements[i,0]
+        #nb = elements[i,1]
+        #for j in list(range(3)):
+            #for k in list(range(3)):
+                #MG[na*3+j, na*3+k] += mg[i][j,k]
+                #MG[nb*3+j, nb*3+k] += mg[i][j+3, k+3]
+                #MG[na*3+j, nb*3+k] += mg[i][j, k+3]
+                #MG[nb*3+j, na*3+k] += mg[i][j+3, k]
+
     # assemble loads vector
     F = np.zeros((KGsize,1))
     for i in list(range(len(loads))):
         for j in list(range(3)):
             F[loads[i,0]*3 + j ] = loads[i, 1+j]
+
+
+    # add gravity loads
+    #AG = np.zeros((KGsize,1))
+    #for i in list(range(len(nodes))):
+        #AG[i*3] = gravityvector[0]
+        #AG[i*3+1] = gravityvector[1]
+        #AG[i*3+2] = gravityvector[2]
+
+    #print(AG)
+    #F += np.dot(MG, AG)
+    #
+    #for i in list(range(noe)):
+        #na = elements[i,0]
+        #nb = elements[i,1]
+        #rho = properties[elements[i,2], 1]
+        #A = properties[elements[i,2], 2]
+        #coord1 = nodes[elements[i,0] ]
+        #coord2 = nodes[elements[i,1] ]
+        #L = ((coord2[0] -coord1[0])**2 +(coord2[1] -coord1[1])**2)**(1/2)
+        #F[na*3+1]+=gravityvector[1]*L*rho*A/2
+        #F[nb*3+1]+=gravityvector[1]*L*rho*A/2
 
     # applies fixity conditions to global stiffness matrix
     bignumber = 8**(sys.float_info.max_10_exp/2)
@@ -157,8 +226,8 @@ elements = np.array([[0,1]])"""
         nb = elements[i,1]
         coord1 = nodes[na]
         coord2 = nodes[nb]
-        Fe.append(np.dot(kg[i], np.vstack((Xge[na], Xge[nb] ))))
-        Fe[i] = np.dot( rotationMatrix(coord1, coord2 ), Fe[i] )
+        Xl = np.dot(rotationMatrix(coord1,coord2), np.vstack((Xge[na], Xge[nb] )))
+        Fe.append(np.dot(ke[i], Xl ))
 
     # normal stresses
     S = []
@@ -166,9 +235,9 @@ elements = np.array([[0,1]])"""
         N = abs(Fe[i][0,0])
         Ma = abs(Fe[i][2,0])
         Mb = abs(Fe[i][5,0])
-        A = properties[elements[i,2], 1 ]
-        I = properties[elements[i,2], 2 ]
-        y = properties[elements[i,2], 3 ]/2
+        A = properties[elements[i,2], 2 ]
+        I = properties[elements[i,2], 3 ]
+        y = properties[elements[i,2], 4 ]/2
         Sxa = N/A + Ma*y/I
         Sxb = N/A + Mb*y/I
         S.append(np.array([Sxa, Sxb ]))
@@ -176,7 +245,11 @@ elements = np.array([[0,1]])"""
     return [X, Fe, S ]
 # end of function solveframe2d()
 
+
+############################
 # solver for 2d trusses
+############################
+
 def solvetruss2d(nodes, elements, properties, loads, fixities ):
     """Finds node displacements, element forces and stresses in a
      2-dimensional linear elastic frame."""

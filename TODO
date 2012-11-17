@@ -1,7 +1,6 @@
 
 To do list:
 
-- Prescribed displacements (implemented, needs validation)
 - Gravity Loading
 - Thermal Loading
 - Hybrid elements in frame analysis
