@@ -13,11 +13,11 @@ nodes = np.array([
     [ 1,2 ]
     ])
 elements = np.array([
-    #[ node a, node b, property set number]
-    [ 0, 1, 0 ],
-    [ 0, 3, 1 ],
-    [ 2, 3, 0 ],
-    [ 2, 5, 0 ]
+    #[ node a, node b, node c, property set number]
+    [ 0, 1, 3, 0 ],
+    [ 0, 3, 2, 1 ],
+    [ 2, 3, 5, 0 ],
+    [ 2, 5, 4, 0 ]
     ])
 
 # material and section properties
@@ -31,7 +31,7 @@ properties = np.array([
 loads = np.array([
     #[ node number, fz]
     [ 2, 1 ],
-    [ 3, 30 ]
+    [ 3, 3 ]
     ])
 nan = float("nan")
 fixities = np.array([
@@ -43,19 +43,19 @@ fixities = np.array([
     [ 5, 0 ]
     ])
 
-R = solveframe2d(nodes, elements, properties, loads, fixities, gravityvector )
+R = solvemembrane(nodes, elements, properties, loads, fixities )
 
 print("\n== DISPLACEMENTS ==\n")
 Dis = np.split(R[0], len(nodes) )
 for i in list(range(len(Dis))):
     print("Node", i, "\n", Dis[i] )
 
-print("\n== ELEMENT FORCES ==\n")
-for i in list(range(len(R[1]))):
-    print("Element", i, "\n", R[1][i] )
+#print("\n== ELEMENT FORCES ==\n")
+#for i in list(range(len(R[1]))):
+    #print("Element", i, "\n", R[1][i] )
 
-print("\n== NORMAL STRESSES ==\nA\t\t    B\n")
-for i in list(range(len(R[2]))):
-    print("Element", i, "\n", R[2][i] )
+#print("\n== NORMAL STRESSES ==\nA\t\t    B\n")
+#for i in list(range(len(R[2]))):
+    #print("Element", i, "\n", R[2][i] )
     
 # vim: ts=4 et sw=4 sts=4 ai

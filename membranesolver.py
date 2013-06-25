@@ -26,21 +26,22 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
     """Finds node displacements in a
      2-dimensional linear elastic membrane."""
 
-    # element's stiffness
-    def Kle(k, A):
+    # element's stiffness matrix
+    def Ke(k, A):
         """Returns a membrane element's stiffness matrix."""
-        invA = np.linalg(A)
+        invA = np.linalg.inv(A)
         K=np.zeros((3,3))
         for i in list(range(3)):
             for j in list(range(3)):
-                K[i,j] = invA[1,i]*invA[1,j]+invA[2,i]*invA[2,j]
-
+                K[i,j] = invA[1][i]*invA[1][j]+invA[2][i]*invA[2][j]
         return K
 
     # degrees of freedom per node
     dof = 1
     # number of elements
     noe = len(elements)
+    # nodes per element
+    nne = len(elements[0])-1
 
     KGsize = np.size(nodes,0)*dof
     KG = np.zeros((KGsize,KGsize))
@@ -48,25 +49,30 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
     # list containing all elements' stiffness in global coordinates
     kg = []
     for i in list(range(noe)):
-        k = properties[elements[i,2], 0]
+        k = properties[elements[i][3]][0]
         NC = np.ones((3,3))
-        coord[0] = nodes[elements[i,0] ]
-        coord[1] = nodes[elements[i,1] ]
-        coord[2] = nodes[elements[i,2] ]
-        L = ((coord2[0] -coord1[0])**2 +(coord2[1] -coord1[1])**2)**(1/2)
-        kg.append(Kge(Kle(E,A,L), coord1, coord2 ))
+        coord = np.array([
+            [ nodes[elements[i][0]][0], nodes[elements[i][0]][1], 1 ],
+            [ nodes[elements[i][1]][0], nodes[elements[i][1]][1], 1 ],
+            [ nodes[elements[i][2]][0], nodes[elements[i][2]][1], 1 ]
+            ])
+        kg.append(Ke( k, coord ))
 
     # assemble global stiffness matrix
     for i in list(range(noe)):
-        na = elements[i,0]
-        nb = elements[i,1]
-        nc = elements[i,2]
-        for j in list(range(dof)):
-            for k in list(range(dof)):
-                KG[na*dof+j, na*dof+k] += kg[i][j,k]
-                KG[nb*dof+j, nb*dof+k] += kg[i][j+dof, k+dof]
-                KG[na*dof+j, nb*dof+k] += kg[i][j, k+dof]
-                KG[nb*dof+j, na*dof+k] += kg[i][j+dof, k]
+        for j in elements[i][0:-1]:
+            for k in elements[i][0:-1]:
+                KG[j,k] += kg[i][
+
+
+
+            
+            for j in list(range(dof*nne)):
+                for k in list(range(dof*nne)):
+                    KG[na*dof+j, na*dof+k] += kg[i][j,k]
+                    KG[nb*dof+j, nb*dof+k] += kg[i][j+dof, k+dof]
+                    KG[na*dof+j, nb*dof+k] += kg[i][j, k+dof]
+                    KG[nb*dof+j, na*dof+k] += kg[i][j+dof, k]
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
