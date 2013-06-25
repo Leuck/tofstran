@@ -33,7 +33,7 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         K=np.zeros((3,3))
         for i in list(range(3)):
             for j in list(range(3)):
-                K[i,j] = invA[1][i]*invA[1][j]+invA[2][i]*invA[2][j]
+                K[i,j] = invA[i,0]*invA[j,0]+invA[i,1]*invA[j,1]
         return K
 
     # degrees of freedom per node
@@ -45,40 +45,48 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
 
     KGsize = np.size(nodes,0)*dof
     KG = np.zeros((KGsize,KGsize))
+    np.disp(KG)
 
     # list containing all elements' stiffness in global coordinates
     kg = []
     for i in list(range(noe)):
-        k = properties[elements[i][3]][0]
-        NC = np.ones((3,3))
+        k = properties[elements[i,3],0]
         coord = np.array([
-            [ nodes[elements[i][0]][0], nodes[elements[i][0]][1], 1 ],
-            [ nodes[elements[i][1]][0], nodes[elements[i][1]][1], 1 ],
-            [ nodes[elements[i][2]][0], nodes[elements[i][2]][1], 1 ]
+            [ nodes[elements[i,0],0], nodes[elements[i,0],1], 1 ],
+            [ nodes[elements[i,1],0], nodes[elements[i,1],1], 1 ],
+            [ nodes[elements[i,2],0], nodes[elements[i,2],1], 1 ]
             ])
-        kg.append(Ke( k, coord ))
+        np.disp(coord)
+        kg.append( Ke(k,coord) )
+
+    for i in list(range(noe)):
+        np.disp(kg[i])
 
     # assemble global stiffness matrix
+    # para cada elemento
     for i in list(range(noe)):
+        #dof = elements[i][0:-1]
+        jint=0
+        kint=0
+        # para cada no (linha)
         for j in elements[i][0:-1]:
+            #para cada no (coluna)
             for k in elements[i][0:-1]:
-                KG[j,k] += kg[i][
+                KG[j,k]=kg[i][jint,kint]
+                kint += 1
+            jint += 1
+        print(jint,kint)
 
 
-
-            
-            for j in list(range(dof*nne)):
-                for k in list(range(dof*nne)):
-                    KG[na*dof+j, na*dof+k] += kg[i][j,k]
-                    KG[nb*dof+j, nb*dof+k] += kg[i][j+dof, k+dof]
-                    KG[na*dof+j, nb*dof+k] += kg[i][j, k+dof]
-                    KG[nb*dof+j, na*dof+k] += kg[i][j+dof, k]
+    np.disp(KG)
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
     for i in list(range(len(loads))):
         for j in list(range(dof)):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
+
+    np.disp(F)
 
     # applies fixity conditions to global stiffness matrix
     bignumber = 8**(sys.float_info.max_10_exp/2)
@@ -96,25 +104,8 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
     X = np.linalg.solve(KG,F)
 
     # forces on elements (in local coordinates)
-    Xge = np.split(X, len(nodes) )
-    Fe = []
-    for i in list(range(noe)):
-        na = elements[i,0]
-        nb = elements[i,1]
-        coord1 = nodes[na]
-        coord2 = nodes[nb]
-        Fe.append(np.dot(kg[i], np.vstack((Xge[na], Xge[nb] ))))
-        Fe[i] = np.dot( rotationMatrix(coord1, coord2 ), Fe[i] )
 
-    # normal stresses
-    S = []
-    for i in list(range(noe)):
-        N = Fe[i][0,0]
-        A = properties[elements[i,2], 1 ]
-        Sx = N/A
-        S.append(np.array([Sx ]))
-
-    return [X, Fe, S ]
+    return X
 # end of function solvetruss2d()
 
 # vim: ts=4 et sw=4 sts=4 ai
