@@ -46,7 +46,7 @@ fixities = np.array([
 R = solvemembrane(nodes, elements, properties, loads, fixities )
 
 print("\n== DISPLACEMENTS ==\n")
-Dis = np.split(R[0], len(nodes) )
+Dis = np.split(R, len(nodes) )
 for i in list(range(len(Dis))):
     print("Node", i, "\n", Dis[i] )
 

@@ -33,7 +33,7 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         K=np.zeros((3,3))
         for i in list(range(3)):
             for j in list(range(3)):
-                K[i,j] = invA[i,0]*invA[j,0]+invA[i,1]*invA[j,1]
+                K[i,j] = k*(invA[i,0]*invA[j,0]+invA[i,1]*invA[j,1])
         return K
 
     # degrees of freedom per node
@@ -56,29 +56,29 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
             [ nodes[elements[i,1],0], nodes[elements[i,1],1], 1 ],
             [ nodes[elements[i,2],0], nodes[elements[i,2],1], 1 ]
             ])
-        np.disp(coord)
+        #np.disp(coord)
         kg.append( Ke(k,coord) )
 
     for i in list(range(noe)):
         np.disp(kg[i])
 
     # assemble global stiffness matrix
-    # para cada elemento
+    # for every element
+    kint=0
     for i in list(range(noe)):
         #dof = elements[i][0:-1]
         jint=0
-        kint=0
-        # para cada no (linha)
+        # for every line
         for j in elements[i][0:-1]:
-            #para cada no (coluna)
+            # and every column
             for k in elements[i][0:-1]:
-                KG[j,k]=kg[i][jint,kint]
+                KG[j,k]+=kg[i][jint,kint]
                 kint += 1
             jint += 1
-        print(jint,kint)
+            kint=0
 
 
-    np.disp(KG)
+    #np.disp(KG)
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
