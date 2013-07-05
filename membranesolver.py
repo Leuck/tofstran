@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# Copyright (C) 2012 Ricardo Frederico Leuck Filho
+# Copyright (C) 2013 Ricardo Frederico Leuck Filho
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
 
     KGsize = np.size(nodes,0)*dof
     KG = np.zeros((KGsize,KGsize))
-    np.disp(KG)
 
     # list containing all elements' stiffness in global coordinates
     kg = []
@@ -59,8 +58,8 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         #np.disp(coord)
         kg.append( Ke(k,coord) )
 
-    for i in list(range(noe)):
-        np.disp(kg[i])
+    #for i in list(range(noe)):
+        #np.disp(kg[i])
 
     # assemble global stiffness matrix
     # for every element
@@ -77,19 +76,13 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
             jint += 1
             kint=0
 
-
-    #np.disp(KG)
-
     # assemble loads vector
     F = np.zeros((KGsize,1))
     for i in list(range(len(loads))):
         for j in list(range(dof)):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
-    np.disp(F)
-
     # applies fixity conditions to global stiffness matrix
-    bignumber = 8**(sys.float_info.max_10_exp/2)
     for i in list(range(len(fixities))):
         for j in list(range(dof)):
             if fixities[i,j+1] == 0:
@@ -100,12 +93,14 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
                 F[fixities[i,0]*dof+j ] = fixities[i,1+j]* \
                         KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ]
 
+    print("\n== GLOBAL STIFFNESS MATRIX ==\n")
+    np.disp(KG)
+    print("\n== GLOBAL LOADS VECTOR ==\n")
+    np.disp(F)
     # solves system
     X = np.linalg.solve(KG,F)
 
-    # forces on elements (in local coordinates)
-
     return X
-# end of function solvetruss2d()
+# end of function solvemembrane()
 
 # vim: ts=4 et sw=4 sts=4 ai

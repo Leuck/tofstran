@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 import numpy as np
 from membranesolver import solvemembrane
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import matplotlib.pyplot as plt
 # data to define a test frame
 # structure geometry
 nodes = np.array([
@@ -48,7 +51,16 @@ R = solvemembrane(nodes, elements, properties, loads, fixities )
 print("\n== DISPLACEMENTS ==\n")
 Dis = np.split(R, len(nodes) )
 for i in list(range(len(Dis))):
-    print("Node", i, "\n", Dis[i] )
+    print("Node", i, "\t", Dis[i][0][0] )
+
+# show results in graphical window
+x=nodes[:,0]
+y=nodes[:,1]
+z=R[:,0]
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.4)
+plt.show()
 
 #print("\n== ELEMENT FORCES ==\n")
 #for i in list(range(len(R[1]))):
