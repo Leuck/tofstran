@@ -38,9 +38,9 @@ loads = np.array([
     ])
 nan = float("nan")
 fixities = np.array([
-    #[ node number, x, y, theta]
+    #[ node number, z]
     # nan means free
-    [ 0, 0 ],
+    [ 0, 0.5 ],
     [ 1, 0 ],
     [ 4, 0 ],
     [ 5, 0 ]
