@@ -18,6 +18,51 @@
 import numpy as np
 import sys
 
+def readmsh(filename):
+    """Get node, element and node group lists."""
+    f = open(filename,'r')
+    lines = f.readlines()
+    for line in np.arange(len(lines)):
+        # get mesh groups
+        if lines[line]=='$PhysicalNames\n':
+            numberOfGroups = int(lines[line+1])
+            groups = np.empty([numberOfGroups, 3])
+            for i in np.arange(numberOfGroups):
+                groups[i] = np.fromstring(lines[line+2+i],sep=' ')
+            #np.disp(groups)
+
+        #get node coordinate list
+        elif lines[line]=='$Nodes\n':
+            numberOfNodes = int(lines[line+1])
+            nodes = np.empty([numberOfNodes, 4])
+            for i in np.arange(numberOfNodes):
+                nodes[i] = np.fromstring(lines[line+2+i],sep=' ')
+        # get elements
+        elif lines[line]=='$Elements\n':
+            numberOfElements = int(lines[line+1])
+            elements = []
+            lineElements = []
+            for i in np.arange(numberOfElements):
+                elementType = np.fromstring(lines[line+2+i],sep=' ')[1]
+                elementGroup = np.fromstring(lines[line+2+i],sep=' ')[3]
+                if elementType==1: # if line element
+                    lineElements.append(np.fromstring(lines[line+2+i],sep=' '))
+                elif elementType==2: # if triangular element
+                    elements.append(np.fromstring(lines[line+2+i],sep=' '))
+    lineelements = np.zeros((len(lineElements),2))
+    for i in np.arange(len(lineElements)):
+        lineelements[i]=lineElements[i][-2:]-1
+    lineelements = lineelements.flatten()
+    lineelements = np.sort(lineelements)
+                
+    triaelements = np.zeros((len(elements),4))
+    for i in np.arange(len(elements)):
+        triaelements[i,0:3]=elements[i][-3:]-1
+
+    nodes = nodes[:,1:4]
+
+    return nodes,triaelements,lineelements
+
 ############################
 # solver for membranes
 ############################
@@ -29,11 +74,13 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
     # element's stiffness matrix
     def Ke(k, A):
         """Returns a membrane element's stiffness matrix."""
+        #np.disp(A)
         invA = np.linalg.inv(A)
+        area = np.linalg.det(A)*0.5
         K=np.zeros((3,3))
         for i in list(range(3)):
             for j in list(range(3)):
-                K[i,j] = k*(invA[i,0]*invA[j,0]+invA[i,1]*invA[j,1])
+                K[i,j] = area*k*(invA[0,i]*invA[0,j]+invA[1,i]*invA[1,j])
         return K
 
     # degrees of freedom per node
@@ -95,8 +142,8 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
 
     print("\n== GLOBAL STIFFNESS MATRIX ==\n")
     np.disp(KG)
-    print("\n== GLOBAL LOADS VECTOR ==\n")
-    np.disp(F)
+    #print("\n== GLOBAL LOADS VECTOR ==\n")
+    #np.disp(F)
     # solves system
     X = np.linalg.solve(KG,F)
 

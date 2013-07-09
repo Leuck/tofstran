@@ -4,16 +4,16 @@ from membranesolver import solvemembrane
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import matplotlib.pyplot as plt
-# data to define a test frame
+# data to define a test membrane
 # structure geometry
 nodes = np.array([
     #[ x, y]
+    [ 0,-1 ],
+    [ 1,-1 ],
     [ 0,0 ],
     [ 1,0 ],
     [ 0,1 ],
-    [ 1,1 ],
-    [ 0,2 ],
-    [ 1,2 ]
+    [ 1,1 ]
     ])
 elements = np.array([
     #[ node a, node b, node c, property set number]
