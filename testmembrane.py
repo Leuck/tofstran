@@ -53,6 +53,9 @@ Dis = np.split(R, len(nodes) )
 for i in list(range(len(Dis))):
     print("Node", i, "\t", Dis[i][0][0] )
 
+print("\n== MAX/MIN DISPLACEMENTS ==\n")
+print(R.max(),"\t",R.min(),"\n")
+
 # show results in graphical window
 x=nodes[:,0]
 y=nodes[:,1]

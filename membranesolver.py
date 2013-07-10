@@ -129,7 +129,7 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         for j in list(range(dof)):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
-    bignumber = KG.max()
+    bignumber = 1000*KG.max()
     # applies fixity conditions to global stiffness matrix
     for i in list(range(len(fixities))):
         for j in list(range(dof)):
