@@ -40,9 +40,9 @@ nan = float("nan")
 fixities = np.array([
     #[ node number, z]
     # nan means free
-    [ 0, 0.5 ],
+    [ 0, -0.2 ],
     [ 1, 0 ],
-    [ 4, 0 ],
+    [ 4, 0.1 ],
     [ 5, 0 ]
     ])
 
@@ -62,7 +62,8 @@ y=nodes[:,1]
 z=R[:,0]
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.4)
+surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.4)
+fig.colorbar(surf)
 plt.show()
 
 #print("\n== ELEMENT FORCES ==\n")

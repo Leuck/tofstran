@@ -66,7 +66,8 @@ y=nodes[:,1]
 z=R[:,0]
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.4)
+surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0.4)
+fig.colorbar(surf)
 plt.show()
 
 #print("\n== ELEMENT FORCES ==\n")
