@@ -3,4 +3,5 @@ The Open and Free Structutal Analysis
 
 This project currently consists of functions for solving two dimensional frames and trusses.
 It is written in python3 and uses numpy. Examples are provided in the test*.py files.
+A solver for elastic membranes is included. Matplotlib >= 1.2.0 is needed to show the membrane example's results.
 
