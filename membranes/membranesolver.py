@@ -112,7 +112,6 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
     # for every element
     kint=0
     for i in list(range(noe)):
-        #dof = elements[i][0:-1]
         jint=0
         # for every line
         for j in elements[i][0:-1]:
