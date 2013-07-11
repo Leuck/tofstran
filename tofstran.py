@@ -132,7 +132,7 @@ elements = np.array([[0,1]])"""
     # list containing all elements' stiffness in global coordinates
     kg = []
     ke = []
-    for i in list(range(noe)):
+    for i in range(noe):
         E = properties[elements[i,2], 0]
         A = properties[elements[i,2], 2]
         I = properties[elements[i,2], 3]
@@ -145,7 +145,7 @@ elements = np.array([[0,1]])"""
 
     ## list containing all elements' mass in global coordinates
     #mg = []
-    #for i in list(range(noe)):
+    #for i in range(noe):
         #rho = properties[elements[i,2], 1]
         #A = properties[elements[i,2], 2]
         #coord1 = nodes[elements[i,0] ]
@@ -154,22 +154,22 @@ elements = np.array([[0,1]])"""
         #mg.append(Kge(Mle(A,rho,L), coord1, coord2 ))
 
     # assemble global stiffness matrix
-    for i in list(range(noe)):
+    for i in range(noe):
         na = elements[i,0]
         nb = elements[i,1]
-        for j in list(range(3)):
-            for k in list(range(3)):
+        for j in range(3):
+            for k in range(3):
                 KG[na*3+j, na*3+k] += kg[i][j,k]
                 KG[nb*3+j, nb*3+k] += kg[i][j+3, k+3]
                 KG[na*3+j, nb*3+k] += kg[i][j, k+3]
                 KG[nb*3+j, na*3+k] += kg[i][j+3, k]
 
     ## assemble global mass matrix
-    #for i in list(range(noe)):
+    #for i in range(noe):
         #na = elements[i,0]
         #nb = elements[i,1]
-        #for j in list(range(3)):
-            #for k in list(range(3)):
+        #for j in range(3):
+            #for k in range(3):
                 #MG[na*3+j, na*3+k] += mg[i][j,k]
                 #MG[nb*3+j, nb*3+k] += mg[i][j+3, k+3]
                 #MG[na*3+j, nb*3+k] += mg[i][j, k+3]
@@ -177,14 +177,14 @@ elements = np.array([[0,1]])"""
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
-    for i in list(range(len(loads))):
-        for j in list(range(3)):
+    for i in range(len(loads)):
+        for j in range(3):
             F[loads[i,0]*3 + j ] = loads[i, 1+j]
 
 
     # add gravity loads
     #AG = np.zeros((KGsize,1))
-    #for i in list(range(len(nodes))):
+    #for i in range(len(nodes)):
         #AG[i*3] = gravityvector[0]
         #AG[i*3+1] = gravityvector[1]
         #AG[i*3+2] = gravityvector[2]
@@ -192,7 +192,7 @@ elements = np.array([[0,1]])"""
     #print(AG)
     #F += np.dot(MG, AG)
     #
-    #for i in list(range(noe)):
+    #for i in range(noe):
         #na = elements[i,0]
         #nb = elements[i,1]
         #rho = properties[elements[i,2], 1]
@@ -205,8 +205,8 @@ elements = np.array([[0,1]])"""
 
     # applies fixity conditions to global stiffness matrix
     bignumber = 8**(sys.float_info.max_10_exp/2)
-    for i in list(range(len(fixities))):
-        for j in list(range(3)):
+    for i in range(len(fixities)):
+        for j in range(3):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*3+j, fixities[i,0]*3+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
@@ -221,7 +221,7 @@ elements = np.array([[0,1]])"""
     # forces on elements (in local coordinates)
     Xge = np.split(X, len(nodes) )
     Fe = []
-    for i in list(range(noe)):
+    for i in range(noe):
         na = elements[i,0]
         nb = elements[i,1]
         coord1 = nodes[na]
@@ -231,7 +231,7 @@ elements = np.array([[0,1]])"""
 
     # normal stresses
     S = []
-    for i in list(range(noe)):
+    for i in range(noe):
         N = abs(Fe[i][0,0])
         Ma = abs(Fe[i][2,0])
         Mb = abs(Fe[i][5,0])
@@ -308,7 +308,7 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
 
     # list containing all elements' stiffness in global coordinates
     kg = []
-    for i in list(range(noe)):
+    for i in range(noe):
         E = properties[elements[i,2], 0]
         A = properties[elements[i,2], 1]
         coord1 = nodes[elements[i,0] ]
@@ -317,11 +317,11 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
         kg.append(Kge(Kle(E,A,L), coord1, coord2 ))
 
     # assemble global stiffness matrix
-    for i in list(range(noe)):
+    for i in range(noe):
         na = elements[i,0]
         nb = elements[i,1]
-        for j in list(range(dof)):
-            for k in list(range(dof)):
+        for j in range(dof):
+            for k in range(dof):
                 KG[na*dof+j, na*dof+k] += kg[i][j,k]
                 KG[nb*dof+j, nb*dof+k] += kg[i][j+dof, k+dof]
                 KG[na*dof+j, nb*dof+k] += kg[i][j, k+dof]
@@ -329,14 +329,14 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
-    for i in list(range(len(loads))):
-        for j in list(range(dof)):
+    for i in range(len(loads)):
+        for j in range(dof):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
     # applies fixity conditions to global stiffness matrix
     bignumber = 8**(sys.float_info.max_10_exp/2)
-    for i in list(range(len(fixities))):
-        for j in list(range(dof)):
+    for i in range(len(fixities)):
+        for j in range(dof):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
@@ -351,7 +351,7 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
     # forces on elements (in local coordinates)
     Xge = np.split(X, len(nodes) )
     Fe = []
-    for i in list(range(noe)):
+    for i in range(noe):
         na = elements[i,0]
         nb = elements[i,1]
         coord1 = nodes[na]
@@ -361,7 +361,7 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
 
     # normal stresses
     S = []
-    for i in list(range(noe)):
+    for i in range(noe):
         N = Fe[i][0,0]
         A = properties[elements[i,2], 1 ]
         Sx = N/A

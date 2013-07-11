@@ -78,8 +78,8 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         invA = np.linalg.inv(A)
         area = np.linalg.det(A)*0.5
         K=np.zeros((3,3))
-        for i in list(range(3)):
-            for j in list(range(3)):
+        for i in range(3):
+            for j in range(3):
                 K[i,j] = area*k*(invA[0,i]*invA[0,j]+invA[1,i]*invA[1,j])
         return K
 
@@ -95,7 +95,7 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
 
     # list containing all elements' stiffness in global coordinates
     kg = []
-    for i in list(range(noe)):
+    for i in range(noe):
         k = properties[elements[i,3],0]
         coord = np.array([
             [ nodes[elements[i,0],0], nodes[elements[i,0],1], 1 ],
@@ -105,13 +105,13 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         #np.disp(coord)
         kg.append( Ke(k,coord) )
 
-    #for i in list(range(noe)):
+    #for i in range(noe):
         #np.disp(kg[i])
 
     # assemble global stiffness matrix
     # for every element
     kint=0
-    for i in list(range(noe)):
+    for i in range(noe):
         jint=0
         # for every line
         for j in elements[i][0:-1]:
@@ -124,14 +124,14 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
 
     # assemble loads vector
     F = np.zeros((KGsize,1))
-    for i in list(range(len(loads))):
-        for j in list(range(dof)):
+    for i in range(len(loads)):
+        for j in range(dof):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
     bignumber = 1000*KG.max()
     # applies fixity conditions to global stiffness matrix
-    for i in list(range(len(fixities))):
-        for j in list(range(dof)):
+    for i in range(len(fixities)):
+        for j in range(dof):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
