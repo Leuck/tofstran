@@ -50,7 +50,7 @@ R = solvemembrane(nodes, elements, properties, loads, fixities )
 
 print("\n== DISPLACEMENTS ==\n")
 Dis = np.split(R, len(nodes) )
-for i in list(range(len(Dis))):
+for i in range(len(Dis)):
     print("Node", i, "\t", Dis[i][0][0] )
 
 print("\n== MAX/MIN DISPLACEMENTS ==\n")
