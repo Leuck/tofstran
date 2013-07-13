@@ -128,17 +128,17 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         for j in range(dof):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
-    bignumber = 1000*KG.max()
     # applies fixity conditions to global stiffness matrix
     for i in range(len(fixities)):
         for j in range(dof):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
-                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = \
-                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] * bignumber
-                F[fixities[i,0]*dof+j ] = fixities[i,1+j]* \
-                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ]
+                for k in range(KGsize):
+                    KG[ fixities[i,0]*dof+j, k] = 0
+                    KG[ k, fixities[i,0]*dof+j ] = 0
+                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = 1
+                F[fixities[i,0]*dof+j ] = fixities[i,j+1]
 
     print("\n== GLOBAL STIFFNESS MATRIX ==\n")
     np.disp(KG)

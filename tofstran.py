@@ -122,6 +122,8 @@ elements = np.array([[0,1]])"""
         Kg = np.dot(np.dot(RM.T, K ), RM )
         return Kg
 
+    # degrees of freedom per node
+    dof = 3
     # number of elements
     noe = len(elements)
 
@@ -204,16 +206,16 @@ elements = np.array([[0,1]])"""
         #F[nb*3+1]+=gravityvector[1]*L*rho*A/2
 
     # applies fixity conditions to global stiffness matrix
-    bignumber = 8**(sys.float_info.max_10_exp/2)
     for i in range(len(fixities)):
         for j in range(3):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*3+j, fixities[i,0]*3+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
-                KG[fixities[i,0]*3+j, fixities[i,0]*3+j ] = \
-                        KG[fixities[i,0]*3+j, fixities[i,0]*3+j ] * bignumber
-                F[fixities[i,0]*3+j ] = fixities[i,1+j]* \
-                        KG[fixities[i,0]*3+j, fixities[i,0]*3+j ]
+                for k in range(KGsize):
+                    KG[ fixities[i,0]*dof+j, k] = 0
+                    KG[ k, fixities[i,0]*dof+j ] = 0
+                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = 1
+                F[fixities[i,0]*dof+j ] = fixities[i,j+1]
 
     # solves system
     X = np.linalg.solve(KG,F)
@@ -334,16 +336,16 @@ def solvetruss2d(nodes, elements, properties, loads, fixities ):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
     # applies fixity conditions to global stiffness matrix
-    bignumber = 8**(sys.float_info.max_10_exp/2)
     for i in range(len(fixities)):
         for j in range(dof):
             if fixities[i,j+1] == 0:
                 KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = float("inf")
             elif not np.isnan(fixities[i,j+1]):
-                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = \
-                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] * bignumber
-                F[fixities[i,0]*dof+j ] = fixities[i,1+j]* \
-                        KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ]
+                for k in range(KGsize):
+                    KG[ fixities[i,0]*dof+j, k] = 0
+                    KG[ k, fixities[i,0]*dof+j ] = 0
+                KG[fixities[i,0]*dof+j, fixities[i,0]*dof+j ] = 1
+                F[fixities[i,0]*dof+j ] = fixities[i,j+1]
 
     # solves system
     X = np.linalg.solve(KG,F)
