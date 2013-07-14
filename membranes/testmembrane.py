@@ -40,9 +40,9 @@ nan = float("nan")
 fixities = np.array([
     #[ node number, z]
     # nan means free
-    [ 0, -0.2 ],
+    [ 0, -0.02 ],
     [ 1, 0 ],
-    [ 4, 0.1 ],
+    [ 4, 0.01 ],
     [ 5, 0 ]
     ])
 
