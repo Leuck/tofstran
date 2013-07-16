@@ -18,7 +18,7 @@ nodes = np.array([
 elements = np.array([
     #[ node a, node b, node c, property set number]
     [ 0, 1, 3, 0 ],
-    [ 0, 3, 2, 1 ],
+    [ 0, 3, 2, 0 ],
     [ 2, 3, 5, 0 ],
     [ 2, 5, 4, 0 ]
     ])
@@ -33,16 +33,16 @@ properties = np.array([
 # contour conditions
 loads = np.array([
     #[ node number, fz]
-    [ 2, 1 ],
-    [ 3, 3 ]
+    [ 2, -5 ],
+    [ 3, -5 ]
     ])
 nan = float("nan")
 fixities = np.array([
     #[ node number, z]
     # nan means free
-    [ 0, -0.02 ],
-    [ 1, 0 ],
-    [ 4, 0.01 ],
+    [ 0, 0.01 ],
+    [ 1, 0.01 ],
+    [ 4, 0 ],
     [ 5, 0 ]
     ])
 

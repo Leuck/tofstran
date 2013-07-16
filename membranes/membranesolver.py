@@ -128,7 +128,7 @@ def solvemembrane(nodes, elements, properties, loads, fixities ):
         for j in range(dof):
             F[loads[i,0]*dof + j ] = loads[i, 1+j]
 
-    np.disp(KG)
+    #np.disp(KG)
     # applies fixity conditions to global stiffness matrix
     for i in range(len(fixities)):
         for j in range(dof):
